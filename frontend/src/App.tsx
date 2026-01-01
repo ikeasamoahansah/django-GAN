@@ -17,9 +17,7 @@ function App() {
       <Nav/>
       <div className="flex flex-1 overflow-hidden">
         <Side selectedItem={selectedSidebarItem} onItemSelect={setSelectedSidebarItem}/>
-        <div className="flex-1 bg-[#1E1E1E] flex items-center justify-center overflow-auto">
-          <MainContent selectedItem={selectedSidebarItem} />
-        </div>
+        <MainContent selectedItem={selectedSidebarItem} />
       </div>
       <Status/>
     </div>
