@@ -1,4 +1,7 @@
 import AddDicomData from './AddDicomData';
+import ImageViewer from './ImageViewer';
+import DicomData from './DicomData';
+import Reports from './Reports';
 
 interface MainContentProps {
     selectedItem: string;
@@ -9,26 +12,11 @@ function MainContent({ selectedItem }: MainContentProps) {
         case 'add-dicom':
             return <AddDicomData />;
         case 'image-viewer':
-            return (
-                <div className="h-full p-8 overflow-auto">
-                    <h1 className="text-2xl font-semibold text-white mb-2">Image Viewer</h1>
-                    <p className="text-gray-400">Image viewer content will go here</p>
-                </div>
-            );
+            return <ImageViewer />;
         case 'dicom-data':
-            return (
-                <div className="h-full p-8 overflow-auto">
-                    <h1 className="text-2xl font-semibold text-white mb-2">DICOM Data</h1>
-                    <p className="text-gray-400">DICOM data content will go here</p>
-                </div>
-            );
+            return <DicomData />;
         case 'reports':
-            return (
-                <div className="h-full p-8 overflow-auto">
-                    <h1 className="text-2xl font-semibold text-white mb-2">Reports</h1>
-                    <p className="text-gray-400">Reports content will go here</p>
-                </div>
-            );
+            return <Reports />;
         default:
             return <AddDicomData />;
     }

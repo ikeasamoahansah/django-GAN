@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Folder, Upload, HardDrive } from 'lucide-react';
+import { Folder, Upload, HardDrive, FolderOpen } from 'lucide-react';
 
 function AddDicomData() {
     const [importSource, setImportSource] = useState<'local' | 'dicomdir'>('local');
@@ -106,12 +106,42 @@ function AddDicomData() {
 
             {/* DICOMDIR Section */}
             {importSource === 'dicomdir' && (
-                <div className="bg-[#2d2d2d] p-6 border border-gray-600">
-                    <h2 className="text-xl font-semibold text-white mb-2">Import from DICOMDIR</h2>
-                    <p className="text-gray-400 mb-6">
-                        Select a DICOMDIR file to import medical imaging data.
-                    </p>
-                    {/* DICOMDIR import UI will go here */}
+                <div className="flex-1 outline-none mt-6">
+                    <div className='bg-[#2B2B2B] border border-[#3E3E42] rounded-lg p-6'>
+                        <h3 className="text-white/80 mb-4">Import from DICOMDIR</h3>
+                        <p className="text-white/60 text-sm mb-6">
+                            Load studies from a DICOMDIR file, typically found on medical imaging CDs/DVDs.
+                        </p>
+
+                        {/* Import Method Buttons */}
+                        <div className="space-y-4">
+                            <div className="border-2 border-dashed border-[#3E3E42] rounded-lg p-12 text-center">
+                                <FolderOpen className="h-12 w-12 text-white/30 mx-auto mb-4" size={32} />
+                                <p className="text-white/60 mb-2">Drop DICOMDIR file here</p>
+                                <p className="text-xs text-white/50 mb-4">or</p>
+                                <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive border hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 h-9 px-4 py-2 has-[>svg]:px-3 bg-[#1E1E1E] border-[#3E3E42] text-white/80 hover:bg-[#3E3E42]">
+                                    Browse for DICOMDIR
+                                </button>
+                            </div>
+                            <div className='shrink-0 data-[orientation=horizontal]:h-px data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-px bg-[#3E3E42]'></div>
+                            <div className="space-y-2">
+                                <label className="flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50 text-white/70">
+                                    DICOMDIR Path
+                                </label>
+                                <div className="flex gap-2">
+                                    <input type="file" name="dicomdir-file" id="dicomdir-file" className="file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 flex h-9 w-full min-w-0 rounded-md border px-3 py-1 text-base transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive bg-[#1E1E1E] border-[#3E3E42] text-white/80" accept=".dicomdir" placeholder='Select DICOMDIR file' />
+                                    <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive border hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 h-9 px-4 py-2 has-[>svg]:px-3 bg-[#2B2B2B] border-[#3E3E42] text-white/80 hover:bg-[#3E3E42]">
+                                        Browse
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="flex justify-end pt-">
+                                <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive h-9 px-4 py-2 has-[>svg]:px-3 bg-[#00A9E0] hover:bg-[#0090C0] text-white">
+                                    Load DICOMDIR
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>
