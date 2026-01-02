@@ -23,7 +23,7 @@ function ImageTranslation() {
                     <p className="text-sm m-2 text-white/60">Generated Image</p>
                     <div className="h-72 flex flex-col items-center justify-center p-8">
                         {/* Placeholder for generated image */}
-                        <div className="w-full h-full bg-[#232323] rounded flex items-center justify-center border border-[#444]">
+                        <div className="w-full h-full bg-[#232323] rounded flex items-center justify-center border border-[#444] border-dashed">
                             <span className="text-white/40 text-sm">No image generated yet</span>
                         </div>
                     </div>
