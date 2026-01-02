@@ -1,4 +1,4 @@
-import { Database, Eye, FileText, BarChart3 } from 'lucide-react';
+import { Database, Eye, FileText, BarChart3, ArrowRightLeft } from 'lucide-react';
 
 interface SideProps {
     selectedItem: string;
@@ -10,6 +10,7 @@ const sidebarItems = [
     { id: 'image-viewer', label: 'Image Viewer', icon: Eye },
     { id: 'dicom-data', label: 'DICOM Data', icon: FileText },
     { id: 'reports', label: 'Reports', icon: BarChart3 },
+    { id: 'translation', label: 'Image Translation', icon: ArrowRightLeft}
 ];
 
 function Side({ selectedItem, onItemSelect }: SideProps) {
