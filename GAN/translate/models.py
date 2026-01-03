@@ -43,3 +43,7 @@ class ImageAnalysis(models.Model):
     
     def __str__(self):
         return f"Analysis for {self.medical_image}"
+
+
+class DICOMData(models.Model):
+    pass
