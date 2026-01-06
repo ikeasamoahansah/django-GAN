@@ -46,4 +46,20 @@ class ImageAnalysis(models.Model):
 
 
 class DICOMData(models.Model):
-    pass
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    medical_image = models.OneToOneField(
+        MedicalImage, 
+        on_delete=models.CASCADE, 
+        related_name='dicom_data'
+    )
+    patient_id = models.CharField(max_length=128, blank=True, null=True)
+    study_date = models.CharField(max_length=20, blank=True, null=True)
+    modality = models.CharField(max_length=16, blank=True, null=True)
+    institution_name = models.CharField(max_length=256, blank=True, null=True)
+    series_description = models.CharField(max_length=256, blank=True, null=True)
+    body_part_examined = models.CharField(max_length=128, blank=True, null=True)
+    dicom_metadata = models.JSONField(default=dict, blank=True)
+    
+
+    def __str__(self):
+        return f"{self.patient_id} | {self.modality}"
