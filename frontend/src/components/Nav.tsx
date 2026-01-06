@@ -1,5 +1,16 @@
 import { Users, Search, Hand, Target, Ruler, User } from 'lucide-react';
 
+// import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useAuth } from "../auth/AuthContext";
+import LoginModal from "./LoginModal";
+
+interface User {
+    id: number;
+    username: string;
+    email?: string;
+}
+
 const menuItems = [
     { name: 'File', icon: Users },
     { name: 'Edit', icon: Search },
@@ -9,6 +20,10 @@ const menuItems = [
 ];
 
 function Nav() {
+
+    const { user, login, logout } = useAuth();
+    const [showLogin, setShowLogin] = useState(false);
+
     return (
         <nav className="h-15 bg-[#2B2B2B] border-b border-[#3E3E42] flex items-center justify-between px-3">
             {/* Left side - Text menu items */}
@@ -46,20 +61,43 @@ function Nav() {
                     >
                         <User className="w-4 h-4" size={20} />
                     </button>
-                    {/* Dropdown menu */}
-                    <div className="absolute right-0 mt-2 w-36 bg-[#232323] border border-[#444] rounded shadow-lg py-2 opacity-0 group-focus-within:opacity-100 group-hover:opacity-100 pointer-events-none group-focus-within:pointer-events-auto group-hover:pointer-events-auto transition-opacity z-20">
-                        <button
-                            className="block w-full text-left px-4 py-2 hover:bg-[#3E3E42] text-white/90 text-sm"
-                            // placeholder onClick for sign-in
-                            onClick={() => alert('Sign in')}
-                        >
-                            Sign In
-                        </button>
+                    {/* <button className="text-white px-3 py-2">
+                        {user ? user.username : "Account"}
+                    </button> */}
+
+                    <div className="absolute right-0 mt-2 w-44 bg-[#232323] rounded shadow-lg py-2 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto">
+
+                        {!user && (
+                            <button
+                                className="block w-full px-4 py-2 text-left text-sm hover:bg-[#3E3E42]"
+                                onClick={() => setShowLogin(true)}
+                            >
+                                Sign In
+                            </button>
+                        )}
+
+                        {user && (
+                            <>
+                                <div className="px-4 py-2 text-sm text-white border-b border-[#444]">
+                                    Signed in as <b>{user.username}</b>
+                                </div>
+
+                                <button
+                                    onClick={logout}
+                                    className="block w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-[#3E3E42]"
+                                >
+                                    Logout
+                                </button>
+                            </>
+                        )}
                     </div>
+
+                    <LoginModal
+                        show={showLogin}
+                        onClose={() => setShowLogin(false)}
+                        onLoginSuccess={login}
+                    />
                 </div>
-                {/* <button className="p-1 hover:bg-[#3E3E42] transition-colors flex items-center justify-center border-0 outline-none focus:outline-none">
-                    <User className="w-4 h-4" size={20} />
-                </button> */}
             </div>
         </nav>
     );

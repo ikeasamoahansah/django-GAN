@@ -30,10 +30,21 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-ALLOWED_ORIGINS = [
-    "*"
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173"
 ]
 
+CORS_ALLOW_CREDENTIALS = True
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+]
+
+CSRF_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_SAMESITE = "None"
+
+CSRF_COOKIE_SECURE = False      # True in production (HTTPS)
+SESSION_COOKIE_SECURE = False  # True in production
 
 # Application definition
 
@@ -46,6 +57,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # user installed apps here
+    'corsheaders',
     'translate',
     'rest_framework'
 ]
@@ -53,6 +65,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -115,7 +128,7 @@ REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+        'rest_framework.permissions.IsAuthenticated'
     ]
 }
 

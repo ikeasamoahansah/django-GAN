@@ -1,13 +1,80 @@
 from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.permissions import AllowAny
 from rest_framework.parsers import MultiPartParser, FormParser
+
+from django.contrib.auth import authenticate, login, logout
 
 from .models import MedicalImage, ImageAnalysis
 from .serializers import MedicalImageSerializer, ImageAnalysisSerializer
 from .tasks import process_dicom_for_translation
 from .services import MedicalImageAnalyzer
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import ensure_csrf_cookie
+
+@api_view(["GET"])
+def me(request):
+    if not request.user.is_authenticated:
+        return Response(status=401)
+
+    user = request.user
+    return Response({
+        "id": user.id,
+        "username": user.username,
+        "email": user.email,
+    })
+
+@ensure_csrf_cookie
+def csrf(request):
+    return JsonResponse({"detail": "CSRF cookie set"})
+
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def login_view(request):
+    username = request.data.get("username")
+    password = request.data.get("password")
+
+    if not username or not password:
+        return Response(
+            {"message": "Username and password required"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    user = authenticate(
+        request=request,
+        username=username,
+        password=password,
+    )
+
+    if user is None:
+        return Response(
+            {"message": "Invalid credentials"},
+            status=status.HTTP_401_UNAUTHORIZED,
+        )
+
+    login(request, user)  # 🔐 creates session
+
+    return Response(
+        {
+            "user": {
+                "id": user.id,
+                "username": user.username,
+                "email": user.email,
+            }
+        },
+        status=status.HTTP_200_OK,
+    )
+
+# Logout
+
+@api_view(["POST"])
+def logout_view(request):
+    logout(request)
+    return Response({"detail": "Logged out"})
 
 
 class MedicalImageViewSet(viewsets.ModelViewSet):
