@@ -4,16 +4,73 @@ from rest_framework import status
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.views import APIView
 
-from django.contrib.auth import authenticate, login, logout
+from rest_framework_simplejwt.tokens import RefreshToken
+
+from django.contrib.auth import authenticate, login, logout, get_user_model
+from django.http import JsonResponse
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 from .models import MedicalImage, ImageAnalysis
 from .serializers import MedicalImageSerializer, ImageAnalysisSerializer
 from .tasks import process_dicom_for_translation
 from .services import MedicalImageAnalyzer
 
-from django.http import JsonResponse
-from django.views.decorators.csrf import ensure_csrf_cookie
+from google.oauth2 import id_token
+from google.auth.transport import requests
+
+User = get_user_model()
+
+
+class GoogleLoginView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        token = request.data.get('token')
+        
+        try:
+            # Verify the token with Google
+            idinfo = id_token.verify_oauth2_token(
+                token, 
+                requests.Request(), 
+                'YOUR_GOOGLE_CLIENT_ID'
+            )
+            
+            # Get user info from the token
+            email = idinfo['email']
+            first_name = idinfo.get('given_name', '')
+            last_name = idinfo.get('family_name', '')
+            
+            # Get or create user
+            user, created = User.objects.get_or_create(
+                email=email,
+                defaults={
+                    'username': email,
+                    'first_name': first_name,
+                    'last_name': last_name,
+                }
+            )
+            
+            # Generate JWT tokens
+            refresh = RefreshToken.for_user(user)
+            
+            return Response({
+                'access_token': str(refresh.access_token),
+                'refresh_token': str(refresh),
+                'user': {
+                    'email': user.email,
+                    'first_name': user.first_name,
+                    'last_name': user.last_name,
+                }
+            })
+            
+        except ValueError:
+            return Response(
+                {'error': 'Invalid token'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
 
 @api_view(["GET"])
 def me(request):

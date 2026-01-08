@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { getCSRF, login } from "../api/auth";
+import GoogleLoginButton from "./GoogleLoginButton";
 
 
 interface LoginModalProps {
@@ -78,6 +79,15 @@ const LoginModal: React.FC<LoginModalProps> = ({ show, onClose, onLoginSuccess }
                     >
                         {loading ? "Signing in..." : "Sign In"}
                     </button>
+                    <div className="flex items-center my-4">
+                        <div className="border-t border-[#444] flex-grow mr-3"></div>
+                        <span className="text-[#bbb] text-xs">or</span>
+                        <div className="border-t border-[#444] flex-grow ml-3"></div>
+                    </div>
+
+                    <div className="flex justify-center mb-1">
+                        <GoogleLoginButton />
+                    </div>
                 </form>
             </div>
         </div>

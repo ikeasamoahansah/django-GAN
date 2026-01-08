@@ -13,3 +13,6 @@ export const logout = () =>
 
 export const getMe = () =>
     api.get("/api/auth/me/");
+
+export const googleOAuth = (token: string) =>
+    api.post("/api/auth/google/", { token });
