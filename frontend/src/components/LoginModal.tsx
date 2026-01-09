@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { getCSRF, login, googleLogin } from "../api/auth";
+import { getCSRF } from "../api/auth";
+import { useAuth } from '../auth/AuthContext';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 
 interface LoginModalProps {
@@ -13,6 +14,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ show, onClose, onLoginSuccess }
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+
+    const { login, googleLogin } = useAuth();
 
     useEffect(() => {
         if (show) getCSRF(); // ensure CSRF cookie exists
@@ -42,7 +45,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ show, onClose, onLoginSuccess }
         try {
             const token = credentialResponse.credential
             await googleLogin(token);
-            window.location.href = '/'
+            onClose();
         } catch (error) {
             console.error('Login failed:', error);
         } finally {
@@ -57,7 +60,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ show, onClose, onLoginSuccess }
     if (!show) return null;
 
     return (
-        <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
             <div className="bg-[#232323] rounded-lg shadow-xl w-full max-w-sm p-6 relative">
                 <button
@@ -99,6 +101,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ show, onClose, onLoginSuccess }
                         {loading ? "Signing in..." : "Sign In"}
                     </button>
                 </form>
+                
+                <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
                 <div className="flex items-center my-4">
                     <div className="border-t border-[#444] flex-grow mr-3"></div>
                     <span className="text-[#bbb] text-xs">or</span>
@@ -112,9 +116,9 @@ const LoginModal: React.FC<LoginModalProps> = ({ show, onClose, onLoginSuccess }
                     useOneTap
                     />
                 </div>
+                </GoogleOAuthProvider>
             </div>
         </div>
-        </GoogleOAuthProvider>
     );
 };
 

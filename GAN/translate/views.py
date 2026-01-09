@@ -2,11 +2,12 @@ from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import action, api_view, permission_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import APIView
 
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.http import JsonResponse
@@ -53,6 +54,9 @@ class GoogleLoginView(APIView):
                     'last_name': last_name,
                 }
             )
+
+            # Create session
+            login(request, user)
             
             # Generate JWT tokens
             refresh = RefreshToken.for_user(user)
@@ -61,7 +65,9 @@ class GoogleLoginView(APIView):
                 'access_token': str(refresh.access_token),
                 'refresh_token': str(refresh),
                 'user': {
+                    'id': user.id,
                     'email': user.email,
+                    'username': user.username,
                     'first_name': user.first_name,
                     'last_name': user.last_name,
                 }
@@ -74,17 +80,19 @@ class GoogleLoginView(APIView):
             )
 
 
-@api_view(["GET"])
-def me(request):
-    if not request.user.is_authenticated:
-        return Response(status=401)
-
-    user = request.user
-    return Response({
-        "id": user.id,
-        "username": user.username,
-        "email": user.email,
-    })
+class UserMeView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        if request.user.is_authenticated:
+            return Response({
+                'id': request.user.id,
+                'username': request.user.username,
+                'email': request.user.email,
+            })
+        else:
+            return Response(None, status=401)
 
 @ensure_csrf_cookie
 def csrf(request):

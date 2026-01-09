@@ -23,7 +23,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     useEffect(() => {
         authApi.getMe()
-            .then(res => setUser(res.data))
+            .then(res => {
+                if (res.data) {
+                    setUser(res.data);
+                } else {
+                    setUser(null);
+                }
+            })
             .catch(() => setUser(null))
             .finally(() => setLoading(false));
     }, []);
@@ -37,7 +43,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const googleLogin = async (token: string) => {
         try {
           const res = await authApi.googleLogin(token);
-          
+          console.log(res)
           // Store the JWT token
           localStorage.setItem('authToken', res.data.access_token);
           if (res.data.refresh_token) {

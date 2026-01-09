@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import MedicalImageViewSet, csrf, login_view, me, logout_view, GoogleLoginView
+from .views import MedicalImageViewSet, csrf, login_view, UserMeView, logout_view, GoogleLoginView
 
 # 1. Create a router instance
 router = DefaultRouter()
@@ -19,7 +19,7 @@ urlpatterns = [
     path('auth/login/', login_view),
     path('auth/google/', GoogleLoginView.as_view(), name='google-login'),
     path('csrf/', csrf),
-    path("auth/me/", me),
+    path("auth/me/", UserMeView.as_view()),
     path("auth/logout/", logout_view),
     
     # You can add other custom paths here if needed later
