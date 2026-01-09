@@ -11,6 +11,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.http import JsonResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.conf import settings
+
 
 from .models import MedicalImage, ImageAnalysis
 from .serializers import MedicalImageSerializer, ImageAnalysisSerializer
@@ -34,7 +36,7 @@ class GoogleLoginView(APIView):
             idinfo = id_token.verify_oauth2_token(
                 token, 
                 requests.Request(), 
-                'YOUR_GOOGLE_CLIENT_ID'
+                settings.GOOGLE_CLIENT_ID
             )
             
             # Get user info from the token
