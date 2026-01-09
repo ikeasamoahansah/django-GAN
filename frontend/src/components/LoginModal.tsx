@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { getCSRF, login } from "../api/auth";
-import GoogleLoginButton from "./GoogleLoginButton";
-
+import { getCSRF, login, googleLogin } from "../api/auth";
+import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 
 interface LoginModalProps {
     show: boolean;
@@ -34,11 +33,31 @@ const LoginModal: React.FC<LoginModalProps> = ({ show, onClose, onLoginSuccess }
         } finally {
             setLoading(false);
         }
+
     };
+
+    const handleGoogleLoginSuccess = async (credentialResponse: any) => {
+        setLoading(true);
+        setError("");
+        try {
+            const token = credentialResponse.credential
+            await googleLogin(token);
+            window.location.href = '/'
+        } catch (error) {
+            console.error('Login failed:', error);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const handleGoogleLoginError = () => {
+        alert('Login Failed')
+    }
 
     if (!show) return null;
 
     return (
+        <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
             <div className="bg-[#232323] rounded-lg shadow-xl w-full max-w-sm p-6 relative">
                 <button
@@ -79,18 +98,23 @@ const LoginModal: React.FC<LoginModalProps> = ({ show, onClose, onLoginSuccess }
                     >
                         {loading ? "Signing in..." : "Sign In"}
                     </button>
-                    <div className="flex items-center my-4">
-                        <div className="border-t border-[#444] flex-grow mr-3"></div>
-                        <span className="text-[#bbb] text-xs">or</span>
-                        <div className="border-t border-[#444] flex-grow ml-3"></div>
-                    </div>
-
-                    <div className="flex justify-center mb-1">
-                        <GoogleLoginButton />
-                    </div>
                 </form>
+                <div className="flex items-center my-4">
+                    <div className="border-t border-[#444] flex-grow mr-3"></div>
+                    <span className="text-[#bbb] text-xs">or</span>
+                    <div className="border-t border-[#444] flex-grow ml-3"></div>
+                </div>
+
+                <div className="flex justify-center mb-1">
+                    <GoogleLogin 
+                    onSuccess={handleGoogleLoginSuccess} 
+                    onError={handleGoogleLoginError}
+                    useOneTap
+                    />
+                </div>
             </div>
         </div>
+        </GoogleOAuthProvider>
     );
 };
 

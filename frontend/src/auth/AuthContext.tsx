@@ -11,6 +11,7 @@ interface AuthContextType {
     user: User | null;
     loading: boolean;
     login: (u: string, p: string) => Promise<void>;
+    googleLogin: (token: string) => Promise<void>;
     logout: () => Promise<void>;
 }
 
@@ -33,13 +34,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(res.data.user);
     };
 
+    const googleLogin = async (token: string) => {
+        try {
+          const res = await authApi.googleLogin(token);
+          
+          // Store the JWT token
+          localStorage.setItem('authToken', res.data.access_token);
+          if (res.data.refresh_token) {
+            localStorage.setItem('refreshToken', res.data.refresh_token);
+          }
+          
+          // Set the user in context
+          setUser(res.data.user);
+        } catch (error) {
+          console.error('Google login failed:', error);
+          throw error;
+        }
+      };
+
     const logout = async () => {
         await authApi.logout();
+        // Clear tokens
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('refreshToken');
         setUser(null);
     };
 
     return (
-        <AuthContext.Provider value={{ user, loading, login, logout }}>
+        <AuthContext.Provider value={{ user, loading, login, googleLogin, logout }}>
             {children}
         </AuthContext.Provider>
     );
