@@ -62,7 +62,8 @@ INSTALLED_APPS = [
     # user installed apps here
     'corsheaders',
     'translate',
-    'rest_framework'
+    'rest_framework',
+    'rest_framework_simplejwt.token_blacklist',
 ]
 
 MIDDLEWARE = [

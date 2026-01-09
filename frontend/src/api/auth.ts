@@ -8,8 +8,12 @@ export const login = (username: string, password: string) =>
         password,
     });
     
-export const logout = () =>
-    api.post("/api/auth/logout/");
+export const logout = () => {
+    const refreshToken = localStorage.getItem('refreshToken');
+    return api.post("/api/auth/logout/", { 
+        refresh_token: refreshToken 
+    });
+};
 
 export const getMe = () =>
     api.get("/api/auth/me/");

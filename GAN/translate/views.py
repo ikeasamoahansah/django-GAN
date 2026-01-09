@@ -138,10 +138,23 @@ def login_view(request):
 
 # Logout
 
-@api_view(["POST"])
-def logout_view(request):
-    logout(request)
-    return Response({"detail": "Logged out"})
+class LogoutView(APIView):
+    authentication_classes = [JWTAuthentication]  # How to authenticate
+    permission_classes = [IsAuthenticated]  # Who can access
+    
+    def post(self, request):
+        try:
+            # Get the refresh token from request
+            refresh_token = request.data.get('refresh_token')
+            
+            if refresh_token:
+                # Blacklist the refresh token
+                token = RefreshToken(refresh_token)
+                token.blacklist()
+            
+            return Response({'message': 'Logged out successfully'}, status=200)
+        except Exception as e:
+            return Response({'error': str(e)}, status=400)
 
 
 class MedicalImageViewSet(viewsets.ModelViewSet):
