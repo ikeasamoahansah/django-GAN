@@ -12,11 +12,22 @@ function ImageTranslation() {
                 <div className="flex-1 bg-[#2B2B2B] border border-dashed border-[#3E3E42] rounded-lg">
                     <p className="text-sm m-2 text-white/60">Input Image</p>
                     <div className="h-72 flex flex-col items-center justify-center p-8">
-                        <FolderOpen className="h-12 w-12 text-white/60 mb-4" />
-                        <span className="text-white/80 font-medium text-lg mb-1">Upload Image</span>
-                        <span className="text-white/50 text-xs mb-4 text-center">
-                            Drag & drop, or click to select a file
-                        </span>
+                        <label
+                            htmlFor="image-upload"
+                            className="flex flex-col items-center justify-center cursor-pointer transition hover:bg-[#35393F]/30 rounded-lg w-full h-full"
+                        >
+                            <FolderOpen className="h-12 w-12 text-white/60 mb-4" />
+                            <span className="text-white/80 font-medium text-lg mb-1">Upload Image</span>
+                            <span className="text-white/50 text-xs mb-4 text-center">
+                                Drag &amp; drop, or click to select a file
+                            </span>
+                            <input
+                                id="image-upload"
+                                type="file"
+                                accept="image/png, image/jpeg"
+                                className="hidden"
+                            />
+                        </label>
                     </div>
                 </div>
                 <div className="flex-1 bg-[#2B2B2B] border border-dashed border-[#3E3E42] rounded-lg">

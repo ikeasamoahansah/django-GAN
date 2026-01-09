@@ -6,13 +6,35 @@ function AddDicomData() {
     const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
 
     const handleFileSelect = () => {
-        // File selection logic will go here
-        setSelectedFiles(['file1.dcm', 'file2.dcm']);
+        // Open a file input dialog and update selectedFiles with the chosen file names
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.dcm,application/dicom';
+        input.multiple = true;
+        input.onchange = (e) => {
+            const files = (e.target as HTMLInputElement).files;
+            if (files) {
+                const fileList = Array.from(files).map(f => f.name);
+                setSelectedFiles(fileList);
+            }
+        };
+        input.click();
     };
 
     const handleFolderSelect = () => {
-        // Folder selection logic will go here
-        setSelectedFiles(['folder1']);
+        // Allow user to select a folder and import all files within it
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.webkitdirectory = true;
+        input.multiple = true;
+        input.onchange = (e) => {
+            const files = (e.target as HTMLInputElement).files;
+            if (files) {
+                const fileList = Array.from(files).map(f => f.webkitRelativePath || f.name);
+                setSelectedFiles(fileList);
+            }
+        };
+        input.click();
     };
 
     return (
@@ -89,8 +111,8 @@ function AddDicomData() {
                                 <div className="flex items-center justify-between pt-4">
                                     {/* Status Text */}
                                     <div className="text-xs text-white/60">
-                                        {selectedFiles.length > 0 ? (
-                                            <span>{selectedFiles.length} file(s) selected</span>
+                                        {selectedFiles && Array.isArray(selectedFiles) && selectedFiles.filter(f => !!f).length > 0 ? (
+                                            <span>{selectedFiles.filter(f => !!f).length} file(s) selected</span>
                                         ) : (
                                             <span>No files selected</span>
                                         )}

@@ -27,11 +27,15 @@ api.interceptors.response.use(
       
       if (error.response?.status === 401 && !originalRequest._retry) {
         originalRequest._retry = true;
+        console.log("Trying refresh");
         
         try {
           const refreshToken = localStorage.getItem('refreshToken');
           if (refreshToken) {
             const response = await axios.post(`${API_BASE_URL}/api/auth/token/refresh/`, {
+              withCredentials: true, // REQUIRED
+              xsrfCookieName: "csrftoken",
+              xsrfHeaderName: "X-CSRFToken",
               refresh: refreshToken
             });
             
@@ -45,7 +49,7 @@ api.interceptors.response.use(
           // Refresh failed, clear tokens and redirect to login
           localStorage.removeItem('authToken');
           localStorage.removeItem('refreshToken');
-          window.location.href = '/login';
+          window.location.href = '/';
           return Promise.reject(refreshError);
         }
       }
