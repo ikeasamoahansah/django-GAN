@@ -1,38 +1,19 @@
-import anthropic
-import base64
+import google.generativeai as genai
 import json
 import re
 from django.conf import settings
 from django.utils import timezone
 from .models import ImageAnalysis
+from PIL import Image
 
 class MedicalImageAnalyzer:
     def __init__(self):
-        self.client = anthropic.Anthropic(
-            api_key=settings.ANTHROPIC_API_KEY
-        )
-    
-    def encode_image(self, image_path):
-        """Convert image to base64"""
-        with open(image_path, 'rb') as img_file:
-            return base64.standard_b64encode(img_file.read()).decode('utf-8')
+        genai.configure(api_key=settings.GOOGLE_API_KEY)
     
     def analyze_image(self, medical_image):
-        """Analyze medical image using Claude API"""
+        """Analyze medical image using Gemini API"""
         
-        # Get image path and encode
         image_path = medical_image.image.path
-        image_base64 = self.encode_image(image_path)
-        
-        # Determine media type
-        media_type_map = {
-            'jpg': 'image/jpeg',
-            'jpeg': 'image/jpeg',
-            'png': 'image/png',
-            'dicom': 'image/dicom',
-        }
-        file_ext = image_path.split('.')[-1].lower()
-        media_type = media_type_map.get(file_ext, 'image/jpeg')
         
         # Create analysis prompt
         prompt = """Analyze this medical image and provide a detailed report in JSON format.
@@ -58,33 +39,12 @@ Important guidelines:
 Return ONLY the JSON object, no markdown formatting."""
 
         try:
-            # Call Claude API
-            message = self.client.messages.create(
-                model="claude-sonnet-4-20250514",
-                max_tokens=2000,
-                messages=[
-                    {
-                        "role": "user",
-                        "content": [
-                            {
-                                "type": "image",
-                                "source": {
-                                    "type": "base64",
-                                    "media_type": media_type,
-                                    "data": image_base64,
-                                },
-                            },
-                            {
-                                "type": "text",
-                                "text": prompt
-                            }
-                        ],
-                    }
-                ],
-            )
+            img = Image.open(image_path)
+            model = genai.GenerativeModel('gemini-pro-vision')
+            response = model.generate_content([prompt, img], stream=False)
             
             # Extract response
-            response_text = message.content[0].text
+            response_text = response.text
             
             # Try to parse JSON from response
             json_match = re.search(r'\{[\s\S]*\}', response_text)
