@@ -1,5 +1,5 @@
 import AddDicomData from './AddDicomData';
-import ImageViewer from './ImageViewer';
+import ImageViewerContainer from './ImageViewer';
 import DicomData from './DicomData';
 import Reports from './Reports';
 import ImageTranslation from './ImageTranslation';
@@ -13,7 +13,7 @@ function MainContent({ selectedItem }: MainContentProps) {
         case 'add-dicom':
             return <AddDicomData />;
         case 'image-viewer':
-            return <ImageViewer />;
+            return <ImageViewerContainer />;
         case 'dicom-data':
             return <DicomData />;
         case 'reports':
