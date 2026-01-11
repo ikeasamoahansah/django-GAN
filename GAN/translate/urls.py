@@ -23,7 +23,7 @@ urlpatterns = [
     path("auth/me/", UserMeView.as_view()),
     path("auth/token/refresh/", TokenRefreshView.as_view(), name='token-refresh'),
     path("auth/logout/", LogoutView.as_view()),
-    path('gan/', GANTranslationView.as_view(), name='gan-translate'),
+    path('translate/gan/', GANTranslationView.as_view(), name='gan-translate'),
     
     # You can add other custom paths here if needed later
 ]
