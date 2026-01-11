@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenRefreshView
-from .views import MedicalImageViewSet, csrf, login_view, UserMeView, LogoutView, GoogleLoginView
+from .views import MedicalImageViewSet, csrf, login_view, UserMeView, LogoutView, GoogleLoginView, GANTranslationView
 
 # 1. Create a router instance
 router = DefaultRouter()
@@ -23,6 +23,7 @@ urlpatterns = [
     path("auth/me/", UserMeView.as_view()),
     path("auth/token/refresh/", TokenRefreshView.as_view(), name='token-refresh'),
     path("auth/logout/", LogoutView.as_view()),
+    path('gan/', GANTranslationView.as_view(), name='gan-translate'),
     
     # You can add other custom paths here if needed later
 ]

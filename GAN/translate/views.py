@@ -10,7 +10,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from django.contrib.auth import authenticate, login, logout, get_user_model
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.conf import settings
 
@@ -18,12 +18,50 @@ from django.conf import settings
 from .models import MedicalImage, ImageAnalysis
 from .serializers import MedicalImageSerializer, ImageAnalysisSerializer
 from .tasks import process_dicom_for_translation
-from .services import MedicalImageAnalyzer
+from .services import MedicalImageAnalyzer, gan_translate_image
 
 from google.oauth2 import id_token
 from google.auth.transport import requests
 
 User = get_user_model()
+
+
+class GANTranslationView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        """
+        Accepts an image and a target modality, and returns the translated image.
+        """
+        image_file = request.data.get('image')
+        target_modality = request.data.get('target_modality') # e.g., 'MRI' or 'CT'
+
+        if not image_file or not target_modality:
+            return Response(
+                {"error": "Image and target_modality are required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if target_modality.upper() not in ['MRI', 'CT']:
+            return Response(
+                {"error": "target_modality must be either 'MRI' or 'CT'."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            output_image_data, output_filename = gan_translate_image(image_file, target_modality)
+            
+            response = HttpResponse(output_image_data, content_type='image/png')
+            response['Content-Disposition'] = f'attachment; filename="{output_filename}"'
+            
+            return response
+
+        except Exception as e:
+            return Response(
+                {'error': f"An error occurred during translation: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class GoogleLoginView(APIView):
