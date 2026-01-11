@@ -8,6 +8,6 @@ createRoot(document.getElementById('root')!).render(
   <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
     <StrictMode>
       <App />
-    </StrictMode>,
+    </StrictMode>
   </GoogleOAuthProvider>
 )
