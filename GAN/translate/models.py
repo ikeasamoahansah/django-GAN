@@ -14,6 +14,7 @@ class MedicalImage(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True)
     translation_status = models.CharField(max_length=50, default='PENDING')
     analyzed_at = models.DateTimeField(null=True, blank=True)
+    translated_image = models.ImageField(upload_to='translated_images/%Y/%m/%d/', blank=True, null=True)
     
     class Meta:
         ordering = ['-uploaded_at']

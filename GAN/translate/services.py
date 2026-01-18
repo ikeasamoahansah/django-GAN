@@ -9,7 +9,7 @@ import io
 
 class MedicalImageAnalyzer:
     def __init__(self):
-        genai.configure(api_key=settings.GOOGLE_API_KEY)
+        self.client = genai.Client(api_key=settings.GEMINI_API_KEY)
     
     def analyze_image(self, medical_image):
         """Analyze medical image using Gemini API"""
@@ -41,13 +41,17 @@ Return ONLY the JSON object, no markdown formatting."""
 
         try:
             img = Image.open(image_path)
-            model = genai.GenerativeModel('gemini-pro-vision')
-            response = model.generate_content([prompt, img], stream=False)
+            
+            response = self.client.models.generate_content(
+                model='gemini-2.0-flash', 
+                contents=[prompt, img]
+            )
             
             # Extract response
             response_text = response.text
             
             # Try to parse JSON from response
+            # Sometimes the model returns ```json ... ``` blocks
             json_match = re.search(r'\{[\s\S]*\}', response_text)
             if json_match:
                 analysis_data = json.loads(json_match.group())
@@ -85,44 +89,137 @@ Return ONLY the JSON object, no markdown formatting."""
             raise Exception(f"Analysis failed: {str(e)}")
 
 
+import torch
+import torchvision.transforms as transforms
+from PIL import Image
+import numpy as np
+import io
+import os
+
+# Import network definitions
+try:
+    from models.networks import define_G
+except ImportError:
+    try:
+        from GAN.models.networks import define_G
+    except ImportError:
+         # Fallback for relative import if run as package
+        from ..models.networks import define_G
+
+class GANTranslator:
+    def __init__(self, target_modality, device=None):
+        self.device = device if device else ('cuda' if torch.cuda.is_available() else 'cpu')
+        self.target_modality = target_modality.upper()
+        self.model = self._load_model()
+
+    def _load_model(self):
+        """
+        Load the generator model based on target modality.
+        User specified:
+        - G_A: CT -> MRI (Target: MRI)
+        - G_B: MRI -> CT (Target: CT)
+        """
+        # Configuration
+        input_nc = 3 # RGB
+        output_nc = 3 # RGB
+        ngf = 64
+        netG = 'HPB'
+        norm = 'instance'
+        
+        # Initialize model
+        model = define_G(input_nc, output_nc, ngf, netG, norm=norm, init_type='normal', init_gain=0.02, gpu_ids=[])
+        
+        # Determine weights path
+        base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) # .../GAN
+        models_dir = os.path.join(base_path, 'models')
+        
+        if self.target_modality == 'MRI':
+            weights_name = 'latest_net_G_A.pth' 
+        elif self.target_modality == 'CT':
+            weights_name = 'latest_net_G_B.pth'
+        else:
+            raise ValueError(f"Unsupported target modality: {self.target_modality}")
+            
+        weights_path = os.path.join(models_dir, weights_name)
+        
+        if not os.path.exists(weights_path):
+             # Try Django settings base dir as fallback
+            try:
+                weights_path = os.path.join(settings.BASE_DIR, 'GAN', 'models', weights_name)
+            except:
+                pass
+
+        if os.path.exists(weights_path):
+            state_dict = torch.load(weights_path, map_location=self.device)
+            # Handle DataParallel wrapping if present in saved weights
+            if list(state_dict.keys())[0].startswith('module.'):
+                state_dict = {k[7:]: v for k, v in state_dict.items()}
+            model.load_state_dict(state_dict)
+            print(f"Loaded weights from {weights_path}")
+        else:
+            print(f"WARNING: Weights not found at {weights_path}. Using random initialization.")
+        
+        model.to(self.device)
+        model.eval()
+        return model
+
+    def preprocess(self, image):
+        """
+        Resize to 256x256, convert to RGB, normalize to [-1, 1]
+        """
+        # Ensure image is RGB
+        if image.mode != 'RGB':
+            image = image.convert('RGB')
+            
+        transform = transforms.Compose([
+            transforms.Resize((256, 256), Image.BICUBIC),
+            transforms.ToTensor(),
+            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+        ])
+        return transform(image).unsqueeze(0).to(self.device)
+
+    def postprocess(self, tensor):
+        """
+        Denormalize [-1, 1] -> [0, 255], convert to PIL
+        """
+        image = tensor.cpu().detach().float().numpy()
+        image = (np.transpose(image, (0, 2, 3, 1)) + 1) / 2.0 * 255.0
+        image = image.clip(0, 255).astype(np.uint8)
+        image = image[0, ..., 0]  # Remove batch and channel dims for grayscale
+        return Image.fromarray(image)
+
+    def translate(self, image):
+        img_tensor = self.preprocess(image)
+        with torch.no_grad():
+            output_tensor = self.model(img_tensor)
+        return self.postprocess(output_tensor)
+
+
 def gan_translate_image(image_file, target_modality):
     """
-    Placeholder function for GAN image translation.
-    This function should be replaced with actual model loading and inference.
+    Main entry point for GAN translation.
     """
+    # Load input image
+    try:
+        input_image = Image.open(image_file)
+    except Exception:
+        # If it's bytes, wrap in BytesIO
+        if isinstance(image_file, (bytes, bytearray)):
+             input_image = Image.open(io.BytesIO(image_file))
+        else:
+            raise
+
+    # Initialize translator
+    translator = GANTranslator(target_modality)
     
-    # Load the input image
-    input_image = Image.open(image_file)
-
-    # --- Placeholder Logic ---
-    # In a real implementation, you would:
-    # 1. Determine the source modality from the input image (if not provided).
-    # 2. Load the appropriate pre-trained GAN model 
-    #    (e.g., a 'CT-to-MRI' model or 'MRI-to-CT' model).
-    #    model = load_gan_model(source='CT', target='MRI')
-    # 3. Preprocess the input image to match the model's expected format 
-    #    (e.g., resize, normalize).
-    #    preprocessed_image = preprocess(input_image)
-    # 4. Run the model inference.
-    #    translated_tensor = model.predict(preprocessed_image)
-    # 5. Post-process the output tensor back into an image.
-    #    output_image = postprocess(translated_tensor)
-
-    # For now, as a placeholder, we'll just convert the image to grayscale
-    # to simulate a transformation.
-    if input_image.mode == 'L':
-        # if it's already grayscale, convert to RGB to show some change
-        output_image = input_image.convert('RGB')
-    else:
-        output_image = input_image.convert('L')
+    # Run inference
+    output_image = translator.translate(input_image)
     
-    # --- End of Placeholder Logic ---
-
-    # Save the output image to an in-memory buffer
+    # Save to buffer
     buffer = io.BytesIO()
     output_image.save(buffer, format='PNG')
     buffer.seek(0)
-
+    
     output_filename = f"translated_{target_modality.lower()}.png"
-
+    
     return buffer.getvalue(), output_filename

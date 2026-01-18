@@ -23,6 +23,9 @@ ANTHROPIC_API_KEY = config('ANTHROPIC_API_KEY')
 # GOOGLE CLIENT ID FOR OAUTH 2.0
 GOOGLE_CLIENT_ID = config('GOOGLE_CLIENT_ID')
 
+# GEMINI API KEY
+GEMINI_API_KEY = config('GEMINI_API_KEY')
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 

@@ -32,9 +32,9 @@ class MedicalImageSerializer(serializers.ModelSerializer):
         """
         Custom validation to check the file extension and set the image_type.
         """
-        uploaded_file = data.get('original_file')
+        uploaded_file = data.get('image')
         if not uploaded_file:
-            raise serializers.ValidationError("An original file must be provided.")
+            raise serializers.ValidationError("An image file must be provided.")
         
         file_name = uploaded_file.name.lower()
         
