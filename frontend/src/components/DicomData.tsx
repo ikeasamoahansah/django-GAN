@@ -12,7 +12,46 @@ function DicomData() {
     };
 
     const handleImportClick = () => {
+        // First, trigger the file input dialog
         inputRef.current?.click();
+
+        // Then, when a file is chosen, handle the upload and POST to backend
+        // We'll attach a one-time event handler to handleFileChange for file upload
+        if (inputRef.current) {
+            const handler = async (event: Event) => {
+                const target = event.target as HTMLInputElement;
+                if (target.files && target.files.length > 0) {
+                    const formData = new FormData();
+                    Array.from(target.files).forEach((file) => {
+                        formData.append('files', file);
+                    });
+
+                    try {
+                        // Replace '/api/upload-dicom/' with your actual backend endpoint
+                        const response = await fetch('/api/upload-dicom/', {
+                            method: 'POST',
+                            body: formData
+                        });
+                        if (!response.ok) {
+                            throw new Error('Failed to upload files.');
+                        }
+                        // Optionally handle successful upload
+                        // const data = await response.json();
+                        // console.log('Upload result:', data);
+                    } catch (error) {
+                        console.error('Upload error:', error);
+                    }
+                }
+                // Remove the event listener after one change to prevent duplicate uploads
+                inputRef.current?.removeEventListener('change', handler);
+                // Reset the file input value to allow re-upload of same file(s)
+                if (inputRef.current) inputRef.current.value = '';
+            };
+
+            // Remove any previous event listener before adding a new one (to be safe)
+            inputRef.current.removeEventListener('change', handler);
+            inputRef.current.addEventListener('change', handler);
+        }
     };
 
     return (
