@@ -6,16 +6,17 @@ import ImageTranslation from './ImageTranslation';
 
 interface MainContentProps {
     selectedItem: string;
+    onNavigate: (item: string) => void;
 }
 
-function MainContent({ selectedItem }: MainContentProps) {
+function MainContent({ selectedItem, onNavigate }: MainContentProps) {
     switch (selectedItem) {
         case 'add-dicom':
             return <AddDicomData />;
         case 'image-viewer':
             return <ImageViewerContainer />;
         case 'dicom-data':
-            return <DicomData />;
+            return <DicomData onNavigate={onNavigate} />;
         case 'reports':
             return <Reports />;
         case 'translation':

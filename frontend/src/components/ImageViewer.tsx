@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FolderOpen, Sparkles, Loader, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import api from '../api/calls';
+import { useDicom } from '../context/DicomContext';
+import { renderDicomToDataURL } from '../utils/dicomRenderer';
 
 interface AnalysisData {
   image_type_detected: string;
@@ -28,6 +30,29 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ baseImage: initialBaseImage, 
   // Heatmap state
   const [isHeatmapVisible, setIsHeatmapVisible] = useState(false);
   const [opacity, setOpacity] = useState(0.5);
+
+  const { selectedDicom } = useDicom();
+
+  useEffect(() => {
+    if (selectedDicom) {
+        setIsLoading(true);
+        setError(null);
+        renderDicomToDataURL(selectedDicom.file)
+            .then(url => {
+                setPreviewUrl(url);
+                setSelectedFile(selectedDicom.file);
+                // Reset analysis/heatmap when switching images
+                setAnalysis(null);
+                setShowReport(false);
+                setIsHeatmapVisible(false);
+            })
+            .catch(err => {
+                console.error("DICOM Render Error:", err);
+                setError('Failed to render DICOM image. Please try a standard image format.');
+            })
+            .finally(() => setIsLoading(false));
+    }
+  }, [selectedDicom]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {

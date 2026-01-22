@@ -15,6 +15,8 @@
     "@react-oauth/google": "^0.13.4",
     "@tailwindcss/vite": "^4.1.18",
     "axios": "^1.13.2",
+    "daikon": "^1.2.46",
+    "dicom-parser": "^1.8.21",
     "headlessui": "^0.0.0",
     "heroicons": "^2.2.0",
     "jwt-decode": "^4.0.0",

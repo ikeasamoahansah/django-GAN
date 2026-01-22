@@ -1,57 +1,41 @@
 import {FolderOpen, Eye, Trash} from 'lucide-react';
 import React, {useRef} from 'react';
+import { useDicom } from '../context/DicomContext';
+import { parseDicomFile } from '../utils/dicomParser';
 
-function DicomData() {
+interface DicomDataProps {
+    onNavigate: (item: string) => void;
+}
+
+function DicomData({ onNavigate }: DicomDataProps) {
     const inputRef = useRef<HTMLInputElement>(null);
+    const { dicomFiles, addDicomFiles, removeDicomFile, selectDicom } = useDicom();
 
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (event.target.files) {
-            console.log(event.target.files);
-            // We can now handle the files upload
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files && event.target.files.length > 0) {
+            const files = Array.from(event.target.files);
+            
+            try {
+                const parsedFiles = await Promise.all(files.map(parseDicomFile));
+                addDicomFiles(parsedFiles);
+            } catch (error) {
+                console.error("Error parsing files:", error);
+            }
+            
+            // Reset the input value to allow re-uploading the same files if needed
+            if (inputRef.current) {
+                inputRef.current.value = '';
+            }
         }
     };
 
     const handleImportClick = () => {
-        // First, trigger the file input dialog
         inputRef.current?.click();
+    };
 
-        // Then, when a file is chosen, handle the upload and POST to backend
-        // We'll attach a one-time event handler to handleFileChange for file upload
-        if (inputRef.current) {
-            const handler = async (event: Event) => {
-                const target = event.target as HTMLInputElement;
-                if (target.files && target.files.length > 0) {
-                    const formData = new FormData();
-                    Array.from(target.files).forEach((file) => {
-                        formData.append('files', file);
-                    });
-
-                    try {
-                        // Replace '/api/upload-dicom/' with your actual backend endpoint
-                        const response = await fetch('/api/upload-dicom/', {
-                            method: 'POST',
-                            body: formData
-                        });
-                        if (!response.ok) {
-                            throw new Error('Failed to upload files.');
-                        }
-                        // Optionally handle successful upload
-                        // const data = await response.json();
-                        // console.log('Upload result:', data);
-                    } catch (error) {
-                        console.error('Upload error:', error);
-                    }
-                }
-                // Remove the event listener after one change to prevent duplicate uploads
-                inputRef.current?.removeEventListener('change', handler);
-                // Reset the file input value to allow re-upload of same file(s)
-                if (inputRef.current) inputRef.current.value = '';
-            };
-
-            // Remove any previous event listener before adding a new one (to be safe)
-            inputRef.current.removeEventListener('change', handler);
-            inputRef.current.addEventListener('change', handler);
-        }
+    const handleView = (file: any) => {
+        selectDicom(file);
+        onNavigate('image-viewer');
     };
 
     return (
@@ -92,44 +76,50 @@ function DicomData() {
                                 </tr>
                             </thead>
                             <tbody className='[&_tr:last-child]:border-0'>
-                                {/* Example hardcoded data for demonstration */}
-                                <tr className="data-[state=selected]:bg-muted border-b transition-colors border-[#3E3E42] hover:bg-[#3E3E42]">
-                                    <td className='p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] text-white/80'>
-                                        {/* Patient Name */}
-                                        John Doe
-                                    </td>
-                                    <td className='p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] text-white/80'>
-                                        {/* Patient ID */}
-                                        123456
-                                    </td>
-                                    <td className='p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] text-white/80'>
-                                        {/* Study Date */}
-                                        2023-10-10
-                                    </td>
-                                    <td className='p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] text-white/80'>
-                                        {/* Modality */}
-                                        CT
-                                    </td>
-                                    <td className='p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] text-white/80'>
-                                        {/* Description */}
-                                        CT Abdomen
-                                    </td>
-                                    <td className='p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] text-white/80'>
-                                        {/* Series */}
-                                        3
-                                    </td>
-                                    <td className='p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] text-white/80'>
-                                        {/* Actions */}
-                                        <div className="flex gap-1">
-                                            <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:hover:bg-accent/50 size-9 rounded-md h-7 w-7 text-white/60 hover:text-white hover:bg-[#3E3E42]">
-                                                <Eye className="h-4 w-4 mr-2" size={24}/>
-                                            </button>
-                                            <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:hover:bg-accent/50 size-9 rounded-md h-7 w-7 text-white/60 hover:text-red-500 hover:bg-[#3E3E42]">
-                                                <Trash className="h-4 w-4 mr-2" size={24}/>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
+                                {dicomFiles.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={7} className="p-4 text-center text-white/50">
+                                            No studies imported. Click "Import Study" to begin.
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    dicomFiles.map((file) => (
+                                        <tr key={file.id} className="data-[state=selected]:bg-muted border-b transition-colors border-[#3E3E42] hover:bg-[#3E3E42]">
+                                            <td className='p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] text-white/80'>
+                                                {file.patientName}
+                                            </td>
+                                            <td className='p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] text-white/80'>
+                                                {file.patientId}
+                                            </td>
+                                            <td className='p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] text-white/80'>
+                                                {file.studyDate}
+                                            </td>
+                                            <td className='p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] text-white/80'>
+                                                {file.modality}
+                                            </td>
+                                            <td className='p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] text-white/80'>
+                                                {file.description}
+                                            </td>
+                                            <td className='p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] text-white/80'>
+                                                {file.seriesNumber}
+                                            </td>
+                                            <td className='p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] text-white/80'>
+                                                <div className="flex gap-1">
+                                                    <button 
+                                                        onClick={() => handleView(file)}
+                                                        className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:hover:bg-accent/50 size-9 rounded-md h-7 w-7 text-white/60 hover:text-white hover:bg-[#3E3E42]">
+                                                        <Eye className="h-4 w-4 mr-2" size={24}/>
+                                                    </button>
+                                                    <button 
+                                                        onClick={() => removeDicomFile(file.id)}
+                                                        className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:hover:bg-accent/50 size-9 rounded-md h-7 w-7 text-white/60 hover:text-red-500 hover:bg-[#3E3E42]">
+                                                        <Trash className="h-4 w-4 mr-2" size={24}/>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
                             </tbody>
                         </table>
                     </div>

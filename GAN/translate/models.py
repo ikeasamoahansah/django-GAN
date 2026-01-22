@@ -10,7 +10,7 @@ class MedicalImage(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     image = models.ImageField(upload_to='medical_images/%Y/%m/%d/')
     image_type = models.CharField(max_length=20, choices=INPUT_TYPE_CHOICES, blank=True)
-    modality = models.CharField(max_length=10, choices=[('CT', 'CT'), ('MRI', 'MRI')])
+    modality = models.CharField(max_length=10, choices=[('CT', 'CT'), ('MRI', 'MRI')], blank=True, null=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     translation_status = models.CharField(max_length=50, default='PENDING')
     analyzed_at = models.DateTimeField(null=True, blank=True)
