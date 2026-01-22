@@ -112,7 +112,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ baseImage: initialBaseImage, 
         {/* Left Side: Image Viewer */}
         <div className={`flex-1 flex flex-col transition-all duration-300 ${showReport ? 'lg:w-2/3' : 'w-full'}`}>
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-bold text-white/90">Medical Image Viewer</h1>
+            <h1 className="text-2xl font-bold text-white/90 text-balance">Medical Image Viewer</h1>
 
             {/* Controls Bar */}
             <div className="flex items-center gap-3">
@@ -199,6 +199,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ baseImage: initialBaseImage, 
                       setAnalysis(null);
                       setShowReport(false);
                     }}
+                    aria-label="Remove image"
                     className="absolute top-4 right-4 bg-black/60 hover:bg-black/80 text-white rounded-full p-2 transition opacity-0 group-hover:opacity-100"
                   >
                     ✕
@@ -229,11 +230,11 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ baseImage: initialBaseImage, 
         {showReport && (
           <div className="w-full lg:w-[400px] xl:w-[450px] bg-[#2B2B2B] border border-[#3E3E42] rounded-lg flex flex-col h-full animate-in slide-in-from-right-10 fade-in duration-300">
             <div className="p-6 border-b border-[#3E3E42] flex items-center justify-between bg-[#232323] rounded-t-lg">
-              <h2 className="text-lg font-semibold flex items-center gap-2">
+              <h2 className="text-lg font-semibold flex items-center gap-2 text-balance">
                 <Sparkles className="h-4 w-4 text-indigo-400" />
                 AI Analysis
               </h2>
-              <button onClick={() => setShowReport(false)} className="text-white/40 hover:text-white">✕</button>
+              <button onClick={() => setShowReport(false)} aria-label="Close report" className="text-white/40 hover:text-white">✕</button>
             </div>
 
             <div className="p-6 overflow-y-auto flex-1 custom-scrollbar">
@@ -248,7 +249,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ baseImage: initialBaseImage, 
                   <div className="p-4 bg-[#1E1E1E] rounded-lg border border-[#3E3E42]">
                     <div className="flex justify-between text-xs text-white/60 mb-2">
                       <span>Confidence</span>
-                      <span>{(analysis.confidence_score * 100).toFixed(0)}%</span>
+                      <span className="tabular-nums">{(analysis.confidence_score * 100).toFixed(0)}%</span>
                     </div>
                     <div className="h-1.5 bg-gray-700 rounded-full overflow-hidden">
                       <div

@@ -57,8 +57,8 @@ function ImageTranslation() {
     return (
         <div className="flex-1 flex flex-col p-8 bg-[#1E1E1E] overflow-hidden">
             <div>
-                <h1 className="text-white/90 text-3xl font-semibold">DeCGAN Image Translation</h1>
-                <p className="text-white/60 text-sm mt-2">Upload an image and select the translation direction</p>
+                <h1 className="text-white/90 text-3xl font-semibold text-balance">DeCGAN Image Translation</h1>
+                <p className="text-white/60 text-sm mt-2 text-pretty">Upload an image and select the translation direction</p>
             </div>
 
             {error && (
@@ -84,6 +84,7 @@ function ImageTranslation() {
                                         setPreviewUrl(null);
                                         setGeneratedImageUrl(null);
                                     }}
+                                    aria-label="Remove image"
                                     className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1"
                                 >
                                     ✕

@@ -30,18 +30,18 @@ function Side({ selectedItem, onItemSelect }: SideProps) {
                                     // const isFirst = index === 0;
                                     
                                     return (
-                                        <div
+                                        <button
                                             key={item.id}
                                             onClick={() => onItemSelect(item.id)}
                                             className={`${
                                                 isSelected
                                                     ? 'bg-[#00A9E0] text-white hover:bg-[#0066AA]'
                                                     : 'bg-[#2b2b2b] text-gray-300 hover:bg-[#3E3E42]'
-                                            } flex items-center gap-2 p-2 rounded cursor-pointer transition-colors text-white`}
+                                            } flex items-center gap-2 p-2 rounded cursor-pointer transition-colors text-white w-full text-left border-0`}
                                         >
                                             <Icon size={15} />
                                             <span className="text-sm">{item.label}</span>
-                                        </div>
+                                        </button>
                                     );
                                 })}
                             </div>

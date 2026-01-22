@@ -17,7 +17,7 @@ function App() {
   return (
     <AuthProvider>
       <DicomProvider>
-        <div className="h-screen w-screen flex flex-col bg-[#1e1e1e] text-gray-300 overflow-hidden ">
+        <div className="h-dvh w-screen flex flex-col bg-[#1e1e1e] text-gray-300 overflow-hidden ">
           <Nav/>
           <div className="flex flex-1 overflow-hidden">
             <Side selectedItem={selectedSidebarItem} onItemSelect={setSelectedSidebarItem}/>

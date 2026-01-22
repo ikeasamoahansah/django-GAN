@@ -41,8 +41,8 @@ function AddDicomData() {
         <div className="flex-1 bg-[#1E1E1E] flex items-center justify-center overflow-auto">
             <div className="flex flex-col gap-2 w-full max-w-4xl px-6">
                 <div className="mb-6">
-                    <h2 className="text-white/90 mb-2">Add DICOM Data</h2>
-                    <p className="text-white/60 text-sm">Import medical imaging data from various sources</p>
+                    <h2 className="text-white/90 mb-2 text-balance">Add DICOM Data</h2>
+                    <p className="text-white/60 text-sm text-pretty">Import medical imaging data from various sources</p>
                 </div>
 
                 {/* Import Source Selection */}
@@ -75,8 +75,8 @@ function AddDicomData() {
                 {importSource === 'local' && (
                     <div className="flex-1 outline-none mt-6">
                         <div className='bg-[#2B2B2B] border border-[#3E3E42] rounded-lg p-6'>
-                            <h3 className="text-white/80 mb-4">Import from Local Storage</h3>
-                            <p className="text-white/60 text-sm mb-6">
+                            <h3 className="text-white/80 mb-4 text-balance">Import from Local Storage</h3>
+                            <p className="text-white/60 text-sm mb-6 text-pretty">
                                 Select DICOM files (.dcm, .dicom) or folders containing DICOM images. Only valid DICOM medical imaging files will be accepted.
                             </p>
 
@@ -85,26 +85,26 @@ function AddDicomData() {
                                 <div>
                                     <label className="items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50 text-white/70 mb-2 block">Import Method</label>
                                     <div className="grid grid-cols-2 gap-4">
-                                        <div
+                                        <button
                                             onClick={handleFolderSelect}
-                                            className="h-32 flex flex-col items-center justify-center gap-3 border-2 border-dashed rounded-lg cursor-pointer transition-all bg-[#1E1E1E] border-[#3E3E42] hover:bg-[#3E3E42] hover:border-[#00A9E0]/50"
+                                            className="h-32 flex flex-col items-center justify-center gap-3 border-2 border-dashed rounded-lg cursor-pointer transition-all bg-[#1E1E1E] border-[#3E3E42] hover:bg-[#3E3E42] hover:border-[#00A9E0]/50 outline-none focus:ring-2 focus:ring-[#00A9E0]"
                                         >
                                             <Folder className="text-[#007ACC]" size={32} />
                                             <div className="text-center">
                                                 <div className="font-medium text-white mb-1">Select Folder</div>
                                                 <div className="text-sm text-gray-400">Browse directories</div>
                                             </div>
-                                        </div>
-                                        <div
+                                        </button>
+                                        <button
                                             onClick={handleFileSelect}
-                                            className="h-32 flex flex-col items-center justify-center gap-3 border-2 border-dashed rounded-lg cursor-pointer transition-all bg-[#1E1E1E] border-[#3E3E42] hover:bg-[#3E3E42] hover:border-[#00A9E0]/50"
+                                            className="h-32 flex flex-col items-center justify-center gap-3 border-2 border-dashed rounded-lg cursor-pointer transition-all bg-[#1E1E1E] border-[#3E3E42] hover:bg-[#3E3E42] hover:border-[#00A9E0]/50 outline-none focus:ring-2 focus:ring-[#00A9E0]"
                                         >
                                             <Upload className="text-[#007ACC]" size={32} />
                                             <div className="text-center">
                                                 <div className="font-medium text-white mb-1">Select Files</div>
                                                 <div className="text-sm text-gray-400">Choose individual files</div>
                                             </div>
-                                        </div>
+                                        </button>
                                     </div>
                                 </div>
                                 <div className='shrink-0 data-[orientation=horizontal]:h-px data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-px bg-[#3E3E42]'></div>

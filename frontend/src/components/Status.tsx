@@ -1,6 +1,6 @@
 function Status() {
     return (
-        <div className="bg-[#1e1e1e] px-2 py-1 flex items-center justify-between text-xs text-gray-300">
+        <div className="bg-[#1e1e1e] px-2 py-1 flex items-center justify-between text-xs text-gray-300 tabular-nums">
             <div className="flex items-center space-x-6">
                 <span>Patient: John Smith</span>
                 <span>PID: 123456789</span>

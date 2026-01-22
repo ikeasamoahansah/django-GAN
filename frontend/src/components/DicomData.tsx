@@ -75,7 +75,7 @@ function DicomData({ onNavigate }: DicomDataProps) {
                                     <th className="h-10 px-2 text-left align-middle font-medium whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] text-white/70">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className='[&_tr:last-child]:border-0'>
+                            <tbody className='[&_tr:last-child]:border-0 tabular-nums'>
                                 {dicomFiles.length === 0 ? (
                                     <tr>
                                         <td colSpan={7} className="p-4 text-center text-white/50">
@@ -107,11 +107,13 @@ function DicomData({ onNavigate }: DicomDataProps) {
                                                 <div className="flex gap-1">
                                                     <button 
                                                         onClick={() => handleView(file)}
+                                                        aria-label="View study"
                                                         className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:hover:bg-accent/50 size-9 rounded-md h-7 w-7 text-white/60 hover:text-white hover:bg-[#3E3E42]">
                                                         <Eye className="h-4 w-4 mr-2" size={24}/>
                                                     </button>
                                                     <button 
                                                         onClick={() => removeDicomFile(file.id)}
+                                                        aria-label="Delete study"
                                                         className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:hover:bg-accent/50 size-9 rounded-md h-7 w-7 text-white/60 hover:text-red-500 hover:bg-[#3E3E42]">
                                                         <Trash className="h-4 w-4 mr-2" size={24}/>
                                                     </button>
