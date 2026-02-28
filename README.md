@@ -3,3 +3,4 @@ Todo:
 - [x] finish other features
 - [] initialize GradCAM for specific regions
 - [x] LLM feedback from Gemini
+- [] ui cleanup
